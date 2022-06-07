@@ -1,6 +1,8 @@
 package AdminForm;
 
+import GetterSetter.PersonalLoanComplete;
 import LoanForms.LoanGet;
+import classPack.DBQuary;
 import classPack.DatabaseConnection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,7 +16,7 @@ import javax.swing.table.TableModel;
 
 public class AdminComponentMenu extends javax.swing.JPanel {
 
-    private String getPayment,payment;
+    //private String getPayment,payment;
     private int type;
 
 
@@ -284,6 +286,7 @@ public class AdminComponentMenu extends javax.swing.JPanel {
     }//GEN-LAST:event_btnSearchCompleteActionPerformed
 
     private void loanHistoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loanHistoryMouseClicked
+        PersonalLoanComplete personal=new PersonalLoanComplete();
         DefaultTableModel model2 = (DefaultTableModel) loanPaymentTable.getModel();
         int selectedRowIndex=loanHistory.getSelectedRow();
         TableModel model = loanHistory.getModel();
@@ -292,72 +295,33 @@ public class AdminComponentMenu extends javax.swing.JPanel {
         String loanNo=(model.getValueAt(selectedRowIndex,3).toString());
         clearAllTableData();
         if(completeLoan.isSelected()){
-            try {
-                java.sql.Connection conn =DatabaseConnection.connect();
-                String sql = "SELECT monthlyPayment,payment FROM personal_loan_complete WHERE CustomerIdOrBusinessReg='"+getId+"' AND loanNumber='"+loanNo+"' ";
-                PreparedStatement pst = conn.prepareStatement(sql);           
-                ResultSet rs = pst.executeQuery();           
-                while(rs.next()){
-                    getPayment=rs.getString("monthlyPayment");
-                    payment=rs.getString("payment");
-                }
-                conn.close();
-            } catch (SQLException e) {
-                System.out.println(e);
-            }
-            String []mon=getPayment.split(",");
-            String []pay=payment.split(",");
-            int a=0;
-            int m=mon.length;//50
-            int p=pay.length;//70
-            int result=0;
-            if(m>p){result=m;
-            }else{result=p;}
-            while(a<result){
-                if(a>=m){model2.addRow(new Object[]{a+1,"",pay[a]});
-                }else{model2.addRow(new Object[]{a+1,mon[a],pay[a]});}
-                a++;
-            }
+            String sql = String.format("SELECT monthlyPayment,payment FROM personal_loan_complete WHERE CustomerIdOrBusinessReg='"+getId+"' AND loanNumber='"+loanNo+"' ");
+            DBQuary.getPersonalLoanCompleteData(personal,sql);
+            
         }else{
-            try {
-                java.sql.Connection conn =DatabaseConnection.connect();
-                if(type==1){//personal
-                    String sql = "SELECT monthlyPayment,payment FROM personal_loan WHERE CustomerIdNumber='"+getId+"' AND loanNumber='"+loanNo+"' ";
-                    PreparedStatement pst = conn.prepareStatement(sql);           
-                    ResultSet rs = pst.executeQuery();           
-                    while(rs.next()){
-                        getPayment=rs.getString("monthlyPayment");
-                        payment=rs.getString("payment");
-                    }
-                }else if(type==2){//business
-                    String sql2 = "SELECT monthlyPayment,payment FROM business_loan WHERE BusinessRegisteredNo='"+getId+"' AND loanNumber='"+loanNo+"' ";
-                    PreparedStatement pst2 = conn.prepareStatement(sql2);           
-                    ResultSet rs2 = pst2.executeQuery();           
-                    while(rs2.next()){
-                        getPayment=rs2.getString("monthlyPayment");
-                        payment=rs2.getString("payment");
-                    } 
-                }else{                   
-                }
-                conn.close();
-            } catch (SQLException e) {
-                System.out.println(e);
+            if(type==1){//personal
+                String sql = "SELECT monthlyPayment,payment FROM personal_loan WHERE CustomerIdNumber='"+getId+"' AND loanNumber='"+loanNo+"' ";         
+                DBQuary.getPersonalLoanCompleteData(personal,sql);
+            }else if(type==2){//business
+                String sql = "SELECT monthlyPayment,payment FROM business_loan WHERE BusinessRegisteredNo='"+getId+"' AND loanNumber='"+loanNo+"' ";
+                DBQuary.getPersonalLoanCompleteData(personal,sql);
             }
-            String []mon=getPayment.split(",");
-            String []pay=payment.split(",");
-            int a=0;
-            int m=mon.length;//50
-            int p=pay.length;//70
-            int result=0;
-            if(m>p){result=m;
-            }else{result=p;}
-            while(a<result){
-                if(a>=m){model2.addRow(new Object[]{a+1,"",pay[a]});
-                }else{model2.addRow(new Object[]{a+1,mon[a],pay[a]});}
-                a++;
-            }
-          
         }
+
+        String []mon=personal.getMonthlyPayment().split(",");
+        String []pay=personal.getPayment().split(",");
+        int a=0;
+        int m=mon.length;//50
+        int p=pay.length;//70
+        int result=0;
+        if(m>p){result=m;
+        }else{result=p;}
+        while(a<result){
+            if(a>=m){model2.addRow(new Object[]{a+1,"",pay[a]});
+            }else{model2.addRow(new Object[]{a+1,mon[a],pay[a]});}
+            a++;
+        }
+         
        
     }//GEN-LAST:event_loanHistoryMouseClicked
 

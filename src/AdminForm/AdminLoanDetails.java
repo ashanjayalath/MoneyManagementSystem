@@ -1,7 +1,10 @@
 package AdminForm;
 
 
-import classPack.AgeChecking;
+import GetterSetter.Rating;
+import GetterSetter.RatingKey;
+import GetterSetter.Shares;
+import classPack.DBQuary;
 import classPack.DatabaseConnection;
 import java.awt.Color;
 import javax.swing.JOptionPane;
@@ -17,11 +20,9 @@ import classPack.LoanCalculation;
 import classPack.NewProfitCal;
 import classPack.ProfitCal;
 import classPack.ValidityCheck;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JScrollBar;
 import scrollbar.ScrollBarCustom;
@@ -91,6 +92,7 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         secondLoadDataComboBox();
         LoanCalLoad();
         getSharesData();
+
         ratingName.setSelectedItem("Default");
         ratingName.addItem("");
         lblSetPresent.setText(Double.toString(presentage));
@@ -118,6 +120,9 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         
     }
 
+    RatingKey rate =new RatingKey();
+    Shares share=new Shares();
+    Rating rating=new Rating();
     public void autoCal(){
         d=Integer.parseInt(dayTerms.getText());
         w1=Integer.parseInt(week1Terms.getText());
@@ -175,11 +180,6 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         ProfitCal auto=new ProfitCal();
         double loan=Double.parseDouble(txtLoanAmount.getText());
 
-        //double []day={1,10000,50000,20,19,18,17,5000};//equal
-        //double []weekTwo={24,20000,200000,50,45,40,35,10000};
-        //double []weekOne={12,10000,100000,50,10000};
-        //double []month={12,50000,300000,60,50000};//equal
-        //double []year={60,400000,5000000,40,100000};//equal
         int co=1;
         if(loan>=day.get(1)){
             double last=day.get(2);
@@ -293,11 +293,7 @@ public class AdminLoanDetails extends javax.swing.JPanel {
             
             //int id;
             try {
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
                 java.sql.Connection conn =DatabaseConnection.connect();
-                // for(int a=0;a<model.getRowCount();a++) {
-                   // id=(int) model.getValueAt(a, 0);
                     day = (Double) model.getValueAt(a, 1);
                     d_rate = (Double) model.getValueAt(a, 2);
                     week_1 = (Double) model.getValueAt(a, 3);
@@ -309,14 +305,11 @@ public class AdminLoanDetails extends javax.swing.JPanel {
                     year = (Double) model.getValueAt(a, 9);
                     year_rate = (Double) model.getValueAt(a, 10);
 
-                    //String sql = "UPDATE micro_rating SET Day_By_Day='"+day+"' , D_rate='"+d_rate+"' ,Week_1='"+week_1+"' ,W_1_rate='"+week_1_rate+"' ,Week_2 ='"+week_2+"' ,W_2_rate ='"+week_2_rate+"'  ,Month='"+month+"'  ,Month_rate='"+month_rate+"'  ,Year='"+year+"' ,Year_rate ='"+year_rate+"' , Rating_Id_name='"+getName+"'   WHERE Rating_Id='"+rate+"' ";// ,Rating_Id='"+rate+"' 
                     String sql = "UPDATE micro_rating SET Day_By_Day='"+day+"' , D_rate='"+d_rate+"' ,Week_1='"+week_1+"' ,W_1_rate='"+week_1_rate+"' ,Week_2 ='"+week_2+"' ,W_2_rate ='"+week_2_rate+"'  ,Month='"+month+"'  ,Month_rate='"+month_rate+"'  ,Year='"+year+"' ,Year_rate ='"+year_rate+"' , Rating_Id_name='"+getName+"'    WHERE Id='"+id+"' ";// ,Rating_Id='"+rate+"'  AND id='"+id+"' 
 
                     PreparedStatement pst = conn.prepareStatement(sql);
                     pst.execute();
 
-                //}
-                //ratingName.addItem(getName);
                 JOptionPane.showMessageDialog(null,"Sucesss...");
                 model.setRowCount(0);
                 conn.close();
@@ -326,18 +319,14 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         }
     }    
     public void tableRefresh(String getRateName,int getType){
-        int type=getType;
-        String rate_name=getRateName;
         try {
-            //Class.forName("com.mysql.jdbc.Driver");
-            //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
             java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "SELECT * FROM micro_rating WHERE Rating_Id_name='"+rate_name+"' ";
+            String sql = "SELECT * FROM micro_rating WHERE Rating_Id_name='"+getRateName+"' ";
             PreparedStatement pst = conn.prepareStatement(sql);
             
             ResultSet rs = pst.executeQuery();
 
-            if(type==0){
+            if(getType==0){
                 while (rs.next()) {
 
                     DefaultTableModel model = (DefaultTableModel) ratingTable.getModel();
@@ -345,7 +334,7 @@ public class AdminLoanDetails extends javax.swing.JPanel {
                     model.addRow(w);
 
                 }
-            }else if(type==1){
+            }else if(getType==1){
                 while (rs.next()) {
 
                     DefaultTableModel model = (DefaultTableModel) ratingTableLoan.getModel();
@@ -365,10 +354,10 @@ public class AdminLoanDetails extends javax.swing.JPanel {
             System.out.println(e);
         }
     }
+
     public void secondLoadDataComboBox(){
         try {
             java.sql.Connection conn =DatabaseConnection.connect();
-            //String sql = "SELECT Rating_Id_name FROM micro_rating_keys GROUP BY Rating_Id_name HAVING COUNT(*) > 1";
             String sql = "SELECT Rating_Id_name FROM micro_rating GROUP BY Rating_Id_name HAVING COUNT(*) > 1 & COUNT(*) <= 1";
             PreparedStatement pst = conn.prepareStatement(sql);
             
@@ -415,11 +404,12 @@ public class AdminLoanDetails extends javax.swing.JPanel {
                 month.add(String.valueOf(rs.getDouble("Month")));
                 monthr.add(String.valueOf(rs.getDouble("Month_rate")));
                 year.add(String.valueOf(rs.getDouble("Year")));
-                yearr.add(String.valueOf(rs.getDouble("Year_rate")));                 
+                yearr.add(String.valueOf(rs.getDouble("Year_rate")));    
+                 
                 
             }
             
-            //ratingName.addItem(getRateName);
+            ratingName.addItem(rate.getRating_Id_name());
             conn.close();
         } catch (Exception e) {
             System.out.println(e);
@@ -432,8 +422,6 @@ public class AdminLoanDetails extends javax.swing.JPanel {
             String tday,td_rate,tweek_1,tweek_1_rate,tweek_2,tweek_2_rate,tmonth,tmonth_rate,tyear,tyear_rate;
             String id,tid;
             
-            //Class.forName("com.mysql.jdbc.Driver");
-            //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
             java.sql.Connection conn =DatabaseConnection.connect();
             String sql = "SELECT * FROM micro_rating WHERE Rating_Id_name='"+update+"' ";
             PreparedStatement pst = conn.prepareStatement(sql); 
@@ -484,8 +472,6 @@ public class AdminLoanDetails extends javax.swing.JPanel {
             
             Double day,d_rate,week_1,week_1_rate,week_2,week_2_rate,month,month_rate,year,year_rate;
             try {
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
                 java.sql.Connection conn =DatabaseConnection.connect();
                 for(int a=0;a<model.getRowCount();a++) {
 
@@ -516,27 +502,13 @@ public class AdminLoanDetails extends javax.swing.JPanel {
 
     }
     public void getSharesData(){
-        String name="share";
-        try {
-            //Class.forName("com.mysql.jdbc.Driver");
-           // java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "SELECT * FROM micro_shares WHERE shares_call_id='"+name+"' ";//shares_call_id
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
+        DBQuary.getSharesData(share);
+        txtCompanyShares.setText(String.valueOf(share.getTotal()));
             
-            while (rs.next()) {
-                String total=String.valueOf(rs.getDouble("total_shares"));
-                txtCompanyShares.setText(total);
-            }
-            double a=Double.parseDouble(txtCompanyShares.getText());
-            txtLoanAmount.setText(Double.toString((a/100)*presentage));
-            txtRateMoney.setText(Double.toString((a/100)*presentage));
-            
-            conn.close();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        double a=Double.parseDouble(txtCompanyShares.getText());
+        txtLoanAmount.setText(Double.toString((a/100)*presentage));
+        txtRateMoney.setText(Double.toString((a/100)*presentage));
+
     }   
     public void clearAllTableData(){
                 
@@ -559,9 +531,6 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         }
     }
     
-    public void clearAllTextbox(){
-        
-    }
     public void enableSelector(){
         comboSelected.setEnabled(true);
         comboLoanType.setEnabled(true);
@@ -2352,34 +2321,12 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         //set rating_key to defualt rating
         String getName=(String) ratingName.getSelectedItem();
 
-        try {
-            //Class.forName("com.mysql.jdbc.Driver");
-            // java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-            java.sql.Connection conn =DatabaseConnection.connect();
+        DBQuary.deleteRatingKey();//delete key data
+        DBQuary.insertRatingKey(rate, getName);//insert key name
+        DBQuary.getRatingKey(rate);//get key Data
+        lblDisplay.setText(rate.getRating_Id_name());
+        lblDisplayDefaultRating.setText(rate.getRating_Id_name());
 
-            String sql = "DELETE FROM micro_rating_keys";//WHERE Rating_Id_name='"+getData+"'
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.execute();
-
-            String sql1 = "INSERT INTO micro_rating_keys SELECT Rating_Id_name FROM micro_rating WHERE Rating_Id_name='"+getName+"' GROUP BY Rating_Id_name HAVING COUNT(*) > 1 & COUNT(*) <= 1";
-            PreparedStatement pst1 = conn.prepareStatement(sql1);
-            pst1.execute();
-
-            String sql2 = "SELECT * FROM micro_rating_keys";
-            PreparedStatement pst2 = conn.prepareStatement(sql2);
-
-            ResultSet rs2 = pst2.executeQuery();
-            while (rs2.next()) {
-                String vb=rs2.getString("Rating_Id_name");
-                lblDisplay.setText(vb);
-                lblDisplayDefaultRating.setText(vb);
-            }
-
-            conn.close();
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
         int index = ratingTableLoan.getRowCount();
         DefaultTableModel model=(DefaultTableModel) ratingTableLoan.getModel();
         for(int v=0;v<index;v++){
@@ -2469,8 +2416,6 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         else{
             String id;
             try {
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
                 java.sql.Connection conn =DatabaseConnection.connect();
                 for(Integer vc:getSelectedRowIndex){
                     id=model.getValueAt(vc,0).toString();
@@ -2496,20 +2441,7 @@ public class AdminLoanDetails extends javax.swing.JPanel {
         String getData=ratingName.getItemAt(ratingName.getSelectedIndex());
         if(getData.equals("Default")){
         }else{
-            try {
-                java.sql.Connection conn =DatabaseConnection.connect();
-                String sql = "DELETE FROM micro_rating WHERE Rating_Id_name='"+getData+"' ";
-                PreparedStatement pst = conn.prepareStatement(sql);
-
-   
-                pst.execute();
-                conn.close();
-                JOptionPane.showMessageDialog(null,"Delete Succesfull..");
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
-
+            DBQuary.deleteRating(getData);//call to delete ratings
             ratingName.removeAllItems();
             ratingName.addItem("");
             clearAllTableData();
@@ -2550,12 +2482,7 @@ public class AdminLoanDetails extends javax.swing.JPanel {
     }//GEN-LAST:event_btnRefrshActionPerformed
 
     private void btnUpdateAndSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateAndSaveActionPerformed
-        //DefaultTableModel model = (DefaultTableModel) ratingTable.getModel();
-        //String getName="";
-        //String getData=ratingName.getItemAt(ratingName.getSelectedIndex());
         if(ratingName.getSelectedItem().equals("Default")){
-            //String getNewName=JOptionPane.showInputDialog(null,"You can't edit and save Default values.\nDid you want save this table to another name?\nEnter the new name and save it");
-            //tableDataInsert("Default");
             btnUpdateAndSave.setEnabled(false);
         }else{
 

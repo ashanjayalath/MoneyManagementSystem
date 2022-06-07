@@ -1,134 +1,53 @@
 package LoanForms;
 
 import AdminForm.AdminLoanDetails;
+import GetterSetter.Business;
+import GetterSetter.BusinessLoanTempory;
+import GetterSetter.Customers;
+import GetterSetter.PersonalLoanTempory;
+import GetterSetter.Rating;
+import GetterSetter.RatingKey;
+import GetterSetter.Shares;
 import classPack.ValidityCheck;
 import classPack.AgeChecking;
+import classPack.DBQuary;
 import classPack.DatabaseConnection;
 import static classPack.DatabaseConnection.EMP;
 import classPack.LoanCalculation;
+import classPack.NicGet;
 import java.awt.Color;
 import javax.swing.JScrollBar;
 import javax.swing.table.DefaultTableModel;
 import scrollbar.ScrollBarCustom;
 import javax.swing.JOptionPane;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import javax.swing.table.TableModel;
-import micro.Employee;
+
 public class LoanGet extends javax.swing.JPanel {
 
 
-    public double getBsum() {
-        return bsum;
-    }
-    public int getBmobile() {
-        return bmobile;
-    }
-    public int getbFix() {
-        return bFix;
-    }
-    public String getbName() {
-        return bName;
-    }
-    public String getBreg() {
-        return breg;
-    }
-    public String getBnature() {
-        return bnature;
-    }
-    public String getbAddress() {
-        return bAddress;
-    }
-    public String getbPost() {
-        return bPost;
-    }
-    public String getbEmail() {
-        return bEmail;
-    }
-    public String getbBusienssLocation() {
-        return bBusienssLocation;
-    }
-    public String getbDuration() {
-        return bDuration;
-    }
-    public String getbLocation() {
-        return bLocation;
-    }
-    public String getbExpeince() {
-        return bExpeince;
-    }
-    public String getbAvailability() {
-        return bAvailability;
-    }
-    public String getC_ID() {
-        return c_ID;
-    }
-    public String getC_Status() {
-        return c_Status;
-    }
-    public String getC_Name() {
-        return c_Name;
-    }
-    public String getC_Add() {
-        return c_Add;
-    }
-    public String getC_email() {
-        return c_email;
-    }
-    public String getC_Gen() {
-        return c_Gen;
-    }
-    public String getC_dob() {
-        return c_dob;
-    }
-    public String getC_Relig() {
-        return c_Relig;
-    }
-    public String getC_Nati() {
-        return c_Nati;
-    }
-    public String getC_Gs() {
-        return c_Gs;
-    }
-    public String getC_Pos() {
-        return c_Pos;
-    }
-    public String getC_Dur() {
-        return c_Dur;
-    }
-    public String getC_Mar() {
-        return c_Mar;
-    }
-    public int getC_HPhone() {
-        return c_HPhone;
-    }
-    public int getC_LPhone() {
-        return c_LPhone;
-    }
+    NicGet getnic=new NicGet();
+    PersonalLoanTempory personalTempary=new PersonalLoanTempory();
+    BusinessLoanTempory BusinessTempary=new BusinessLoanTempory();
+    Rating rate=new Rating();
+    RatingKey rateKey=new RatingKey();
+    Shares share=new Shares();
+    Customers customer=new Customers();
+    Business business=new Business();
+   
 
-    private int selectedIndex,a,b,c,d;
-    private double SumofInsured,LoanAmount;
-    private String c_ID,c_Status,c_Name,c_Add,c_email,c_Gen,c_dob,c_Relig,c_Nati,c_Gs,c_Pos,c_Dur,c_Mar;
-    private int c_HPhone,c_LPhone;
-    private String g_Name,g_Nic,g_Add,g_email;
-    private int g_HandPhone,g_LandPhone;
-    private String t_loanName,t_loanType,t_state,t_formNo;
+
+    private double LoanAmount,SumofInsured,selectedIndex;
+    private String t_loanName,t_loanType,t_state;
     private double t_loanAmount,t_loanRate;
     private int t_terms;
     private int deleat;
-    private String bName,breg,bnature,bAddress,bPost,bEmail,bBusienssLocation,bDuration,bLocation,bExpeince,bAvailability;
-    private String b_LoanName,b_LoanType,b_reg,b_LoanStatus,b_formNo;
+    private String b_LoanName,b_LoanType,b_reg,b_LoanStatus;
     private Double b_LoanAmount,b_interestRate;
     private int b_terms;
-    
-    private int bmobile,bFix;
-    private double bsum;
     private String getFNumber;
     private String approllNic="n",approllBReg="n";
-    private String getLoanName;
-    
 
     
 
@@ -142,28 +61,11 @@ public class LoanGet extends javax.swing.JPanel {
             id=FinalSearch.getText();
         }
         
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "DELETE FROM c_personal_loan_tempory WHERE `CustomerIdNumber`='"+id+"' ";//WHERE Rating_Id_name='"+getData+"' 
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.execute();
-            deleat=1;
-            
-            String sql2 = "DELETE FROM c_details WHERE `CustomerIdNumber`='"+id+"' ";
-            PreparedStatement pst2 = conn.prepareStatement(sql2);
-            pst2.execute();
-            
-            
-            String sql3 = "DELETE FROM c_guarantor_details WHERE c_guarantor_details.CustomerIdNumber='"+id+"' ";
-            PreparedStatement pst3 = conn.prepareStatement(sql3);
-            pst3.execute();
-            
-            
-        JOptionPane.showMessageDialog(null,"Data Deleate sucessfull..");
-        conn.close();            
-        }catch(Exception v){
-            System.err.println(v);
-        }
+        DBQuary.delelePersonalLoanTemporary(id);
+        deleat=1;
+        DBQuary.deleteCustomers(id);
+        DBQuary.deleteGuarantors(id);
+
     }
     public void deleateBusiness(){
         String id="";
@@ -173,17 +75,9 @@ public class LoanGet extends javax.swing.JPanel {
             id=FinalSearch.getText();;
         }
         
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "DELETE FROM c_business_loan_tempory WHERE `BusinessRegisteredNo`='"+id+"' ";//WHERE Rating_Id_name='"+getData+"' 
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.execute();
-            deleat=2;
-        JOptionPane.showMessageDialog(null,"Deleate sucessfull..");              
-        conn.close();            
-        }catch(Exception v){
-            System.err.println(v);
-        }
+        DBQuary.deleteBusinessLoanTemporaryTwo(id);
+        deleat=2;
+
     }
     public LoanGet() {
         initComponents();
@@ -216,62 +110,37 @@ public class LoanGet extends javax.swing.JPanel {
     public void approall(){
         int type=loanReciever.getSelectedIndex();
         String formNumber;
-        String setValue="Request";
         if(getFormNumber.getText().length()>1){
-            try {
-                java.sql.Connection conn =DatabaseConnection.connect();
-                if(type==0){
-                   
-                    String newNic;
-                    if(c_Nic.getText().length()==9){
-                        newNic="19"+c_Nic.getText();
-                    }else{
-                        newNic=c_Nic.getText();
-                    }  
-                    String sql="UPDATE c_personal_loan_tempory SET loanStatus='"+setValue+"' WHERE CustomerIdNumber='"+newNic+"' ";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();      
+            if(type==0){
+                String newNic=NicGet.getNicNumber(c_Nic.getText());
+                DBQuary.updatePersonalLoanTemporary(newNic);
 
-                    String sql2 = "SELECT loanStatus FROM c_personal_loan_tempory";
-                    PreparedStatement pst2 = conn.prepareStatement(sql2);
-                    ResultSet rs = pst2.executeQuery();   
-                    while (rs.next()) {
-                        String vb=rs.getString("loanStatus");
-                        lblStatus.setText(vb);
-                    }
-                }else{//load and save bussiness
-                    
-                    String reg=b_regNo.getText();
-                   
-                    
-                    String sql="UPDATE c_business_loan_tempory SET loanStatus='"+setValue+"' WHERE BusinessRegisteredNo='"+reg+"' ";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();      
+                DBQuary.getPersonalLoanTemporaryTwo(personalTempary);
+                lblStatus.setText(personalTempary.getLoanStatus());
 
-                    String sql2 = "SELECT loanStatus FROM c_business_loan_tempory";
-                    PreparedStatement pst2 = conn.prepareStatement(sql2);
-                    ResultSet rs = pst2.executeQuery();   
-                    while (rs.next()) {
-                        String vb=rs.getString("loanStatus");
-                        lblStatus.setText(vb);
-                    }
-                }
-                if(lblStatus.getText()=="Request"){
+            }else{//load and save bussiness
+                String reg=b_regNo.getText();
+                DBQuary.updateBusinessLoanTemporary(reg);
+
+                DBQuary.getBusinessLoanTemporaryTwo(BusinessTempary);
+                lblStatus.setText(BusinessTempary.getLoanStatus());
+
+            }
+            
+            switch(lblStatus.getText()){
+                case "Request":
                     lblStatus.setForeground(Color.BLUE);
-                }else if(lblStatus.getText()=="Pending"){
+                    break;
+                case "Pending":
                     lblStatus.setForeground(Color.ORANGE);
-                }else if(lblStatus.getText()=="Active"){
+                    break;
+                case "Active":
                     lblStatus.setForeground(Color.GREEN);
-                }else{
+                    break;
+                default:
                     lblStatus.setForeground(Color.RED);
-                }
-
-                JOptionPane.showMessageDialog(null,"Done");
-                conn.close();
-
-            } catch (Exception e) {
-                System.out.println(e);
-            }//catch(DuplicateEntityException)
+                    break;
+            }
         }else{
             JOptionPane.showMessageDialog(null,"Please enter Form Number");
             
@@ -282,71 +151,55 @@ public class LoanGet extends javax.swing.JPanel {
         String newNic="";
         String reg="";
         if(!getFNumber.isEmpty()){
-            try {
-                java.sql.Connection conn =DatabaseConnection.connect();
-                if(type==0){
-                    
-                    if(c_Nic.getText().length()>=1){
-                        if(c_Nic.getText().length()==9){
-                            newNic="19"+c_Nic.getText();
-                        }else{
-                            newNic=c_Nic.getText();
-                        }  
-                    }else if(FinalSearch.getText().length()>=1){
-                        if(FinalSearch.getText().length()==9){
-                            newNic="19"+FinalSearch.getText();
-                        }else{
-                            newNic=FinalSearch.getText();
-                        }                          
-                    }else{
-                        JOptionPane.showMessageDialog(null,"Error Nic");
-                    }
-                    String sql="UPDATE c_personal_loan_tempory SET loanStatus='Request',comment='' WHERE CustomerIdNumber='"+newNic+"' ";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();      
+            if(type==0){
 
-                    String sql2 = "SELECT loanStatus FROM c_personal_loan_tempory";
-                    PreparedStatement pst2 = conn.prepareStatement(sql2);
-                    ResultSet rs = pst2.executeQuery();   
-                    while (rs.next()) {
-                        String vb=rs.getString("loanStatus");
-                        lblStatus.setText(vb);
-                    }
-                }else{//load and save bussiness
-                    
-                    if(b_regNo.getText().length()>=1){
-                        reg=b_regNo.getText();
+                if(c_Nic.getText().length()>=1){
+                    if(c_Nic.getText().length()==9){
+                        newNic="19"+c_Nic.getText();
                     }else{
-                        reg=FinalSearch.getText();
-                    }
-                    String sql="UPDATE c_business_loan_tempory SET loanStatus='Request',comment='' WHERE BusinessRegisteredNo='"+reg+"' ";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();      
-
-                    String sql2 = "SELECT loanStatus FROM c_business_loan_tempory";
-                    PreparedStatement pst2 = conn.prepareStatement(sql2);
-                    ResultSet rs = pst2.executeQuery();   
-                    while (rs.next()) {
-                        String vb=rs.getString("loanStatus");
-                        lblStatus.setText(vb);
-                    }
-                }
-                if(lblStatus.getText()=="Request"){
-                    lblStatus.setForeground(Color.BLUE);
-                }else if(lblStatus.getText()=="Pending"){
-                    lblStatus.setForeground(Color.ORANGE);
-                }else if(lblStatus.getText()=="Active"){
-                    lblStatus.setForeground(Color.GREEN);
+                        newNic=c_Nic.getText();
+                    }  
+                }else if(FinalSearch.getText().length()>=1){
+                    if(FinalSearch.getText().length()==9){
+                        newNic="19"+FinalSearch.getText();
+                    }else{
+                        newNic=FinalSearch.getText();
+                    }                          
                 }else{
-                    lblStatus.setForeground(Color.RED);
+                    JOptionPane.showMessageDialog(null,"Error Nic");
                 }
 
-                JOptionPane.showMessageDialog(null,"Done");
-                conn.close();
+                DBQuary.updatePersonalLoanTemporaryTwo(newNic);    
 
-            } catch (Exception e) {
-                System.out.println(e);
-            }//catch(DuplicateEntityException)
+                DBQuary.getPersonalLoanTemporaryTwo(personalTempary);
+                lblStatus.setText(personalTempary.getLoanStatus());
+
+            }else{//load and save bussiness
+
+                if(b_regNo.getText().length()>=1){
+                    reg=b_regNo.getText();
+                }else{
+                    reg=FinalSearch.getText();
+                }
+                DBQuary.updateBusinessLoanTemporary(reg);
+                DBQuary.getBusinessLoanTemporaryTwo(BusinessTempary);
+                lblStatus.setText(BusinessTempary.getLoanStatus());
+
+            }
+            switch(lblStatus.getText()){
+                case "Request":
+                    lblStatus.setForeground(Color.BLUE);
+                    break;
+                case "Pending":
+                    lblStatus.setForeground(Color.ORANGE);
+                    break;
+                case "Active":
+                    lblStatus.setForeground(Color.GREEN);
+                    break;
+                default:
+                    lblStatus.setForeground(Color.RED);
+                    break;
+            }
         }else{
             JOptionPane.showMessageDialog(null,"Please enter Form Number");
             
@@ -425,38 +278,22 @@ public class LoanGet extends javax.swing.JPanel {
             c_Nic.setForeground(Color.GREEN);
         }
     }
-    public void update(String getId,String getUpName,int v){
+    public void update(String getId,String getUpName,int a){
+        ArrayList<String> pass=new ArrayList<>();
         DefaultTableModel model = (DefaultTableModel) tblGuarantorsDetails.getModel();
-        String rate="";
-        String id=getId;
-        int a=v;
-        String getName=getUpName; 
         if(tblGuarantorsDetails.getRowCount()>=1){
-            String Gname,Nic,GAddress,Gemail,newNic;
-            int Hphone,Lphone;
-            //int id;
-            try {
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-                java.sql.Connection conn =DatabaseConnection.connect();    
-                    Gname=(String) model.getValueAt(a, 0);
-                    Nic=(String) model.getValueAt(a, 1);
-                    Hphone=(int) model.getValueAt(a, 2);
-                    Lphone=(int) model.getValueAt(a, 3);
-                    GAddress=(String) model.getValueAt(a, 4);
-                    Gemail=(String) model.getValueAt(a, 5);
+            //Gname,Nic,Hphone,Lphone,GAddress,Gemail,id
+            pass.add((String) model.getValueAt(a, 0));
+            pass.add((String) model.getValueAt(a, 1));
+            pass.add((String) model.getValueAt(a, 2));
+            pass.add((String) model.getValueAt(a, 3));
+            pass.add((String) model.getValueAt(a, 4));
+            pass.add((String) model.getValueAt(a, 5));     
+            
+            DBQuary.updateGuarantors(pass,getId);
+            
+            model.setRowCount(0);
 
-                    String sql = "UPDATE c_guarantor_details SET Guarantor_Name='"+Gname+"',Guarantor_Nic='"+Nic+"',Guarantor_Phone_Number='"+Hphone+"',Guarantor_Land_Phone='"+Lphone+"',Guarantor_Home_Address='"+GAddress+"',Guarantor_Email='"+Gemail+"' WHERE Guarantor_Nic='"+id+"' "; 
-
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();
-
-                JOptionPane.showMessageDialog(null,"Sucesss...");
-                model.setRowCount(0);
-                conn.close();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
         }
     }    
     public void tableRefresh(String getRateName,int tableOne){
@@ -488,69 +325,35 @@ public class LoanGet extends javax.swing.JPanel {
             System.out.println(e);
         }
     }
-    public void secondLoadDataComboBox(){
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            //String sql = "SELECT Rating_Id_name FROM micro_rating_keys GROUP BY Rating_Id_name HAVING COUNT(*) > 1";
-            String sql = "SELECT Rating_Id_name FROM micro_rating GROUP BY Rating_Id_name HAVING COUNT(*) > 1 & COUNT(*) <= 1";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                String Rating_Id_name = rs.getString("Rating_Id_name");                               
-                //ratingName.addItem(Rating_Id_name);
-               // ratingName1.addItem(Rating_Id_name);
-            }
-            
-            String sql2 = "SELECT * FROM micro_rating_keys";
-            PreparedStatement pst1 = conn.prepareStatement(sql2);
-            
-            ResultSet rs1 = pst1.executeQuery();   
-            while (rs1.next()) {
-                String vb=rs1.getString("Rating_Id_name");
-                //lblDisplay.setText(vb);
-                //lblDisplayDefaultRating.setText(vb);
-            }
-            conn.close();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
     public void LoanCalLoad(){
         try {
             java.sql.Connection conn =DatabaseConnection.connect();
             String sql = "SELECT * FROM micro_rating,micro_rating_keys WHERE micro_rating_keys.Rating_Id_name = micro_rating.Rating_Id_name ";
             PreparedStatement pst = conn.prepareStatement(sql);
-            
             ResultSet rs = pst.executeQuery();
-
             while (rs.next()) {
                 
                 DefaultTableModel model = (DefaultTableModel) tblGuarantorsDetails.getModel();
                 Object w[]={rs.getDouble("Day_By_Day"),rs.getDouble("D_rate"),rs.getDouble("Week_1"),rs.getDouble("W_1_rate"),rs.getDouble("Week_2"),rs.getDouble("W_2_rate"),rs.getDouble("Month"),rs.getDouble("Month_rate"),rs.getDouble("Year"),rs.getDouble("Year_rate"),rs.getString("Rating_Id_name")};
                 model.addRow(w);
-
             }
-            
-
-            //ratingName.addItem(getRateName);
+            pst.close();
+            rs.close();
             conn.close();
         } catch (Exception e) {
             System.out.println(e);
         }
     }
     public void tableDataUpdate(String getUpdate){       
-        try{
-            java.sql.Connection conn =DatabaseConnection.connect();            
-            String sql= "UPDATE `c_guarantor_details` SET `Guarantor_Name`='"+txtGirantorName.getText()+"',`Guarantor_Phone_Number`='"+txtGirantorHPhone.getText()+"',`Guarantor_Land_Phone`='"+txtGirantorLPhone.getText()+"',`Guarantor_Home_Address`='"+txtGirantorHomeAddress.getText()+"',`Guarantor_Email`='"+txtGirantorEmail.getText()+"',`CustomerIdNumber`='"+c_Nic.getText()+"' WHERE Guarantor_Nic='"+getUpdate+"' ";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.execute();
-            
-            conn.close();
-        }catch(Exception z){
-            JOptionPane.showMessageDialog(null,"Error \n\n"+z.getMessage());
-        }
-
+        ArrayList<String> p=new ArrayList<>();
+        p.add(txtGirantorName.getText());
+        p.add(c_Nic.getText());
+        p.add(txtGirantorHPhone.getText());
+        p.add(txtGirantorLPhone.getText());
+        p.add(txtGirantorHomeAddress.getText());
+        p.add(txtGirantorEmail.getText());
+        DBQuary.updateGuarantors(p, c_Nic.getText());
+        //Gname,Nic,Hphone,Lphone,GAddress,Gemail,id
     }
     public void tableDataInsert(String name){
         DefaultTableModel model = (DefaultTableModel) tblGuarantorsDetails.getModel();
@@ -589,27 +392,7 @@ public class LoanGet extends javax.swing.JPanel {
         }
 
     }
-    public void getSharesData(){
-        String name="share";
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "SELECT * FROM micro_shares WHERE shares_call_id='"+name+"' ";//shares_call_id
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            
-            while (rs.next()) {
-                String total=String.valueOf(rs.getDouble("total_shares"));
-            }
-    
-            conn.close();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }   
     public void clearAllTableData(){
-                
-       // ratingName.setSelectedItem("");
-      //  btnRefrsh.setEnabled(false);
         DefaultTableModel model = (DefaultTableModel) tblGuarantorsDetails.getModel();
         while(true){
             if(tblGuarantorsDetails.getRowCount()==0){
@@ -631,17 +414,13 @@ public class LoanGet extends javax.swing.JPanel {
         comboMonth.setSelectedIndex(0);comboDay.setSelectedIndex(0);cComboReligion.setSelectedIndex(0);  male.isSelected();
         comboNationality.setSelectedIndex(0);c_Mobile_Number.setText("");c_Land_Phone_Number.setText("");
         c_Email.setText("");cGSDiv.setText("");cPotalCode.setText("");cDurYear.setText("");cDurMonth.setText("");
-        cMariSingle.isSelected();c_ID="";c_Status="";c_Name="";c_HPhone=0;c_LPhone=0;c_Add="";c_email="";
-        c_Gen="";c_dob="";c_Relig="";c_Nati="";c_Gs="";c_Pos="";c_Dur="";c_Mar="";
-        
-        
+        cMariSingle.isSelected();
     }
     public void clearBusinessData(){
         b_Name.setText("");b_NatureBus.setText("");b_Add1.setText("");b_Add2.setText("");b_PostCode.setText("");
         b_Hphone.setText("");b_Lphone.setText("");b_Email.setText("");b_LocatOwner.setSelectedItem(0); b_DurYear.setText("");
         b_DurMonth.setText("");b_Location.setSelectedItem(0);b_ExpYear.setText("");b_ExpMonth.setText(""); b_AYes.isSelected();
-        b_SumInsured.setText("");bName="";breg="";bnature="";bAddress="";bPost="";bEmail="";bBusienssLocation="";bDuration="";bLocation="";
-        bExpeince="";bAvailability="";bmobile=0;bFix=0;bsum=0;
+        b_SumInsured.setText("");
 
     }
     public void clearBasicLoanData(){
@@ -653,105 +432,79 @@ public class LoanGet extends javax.swing.JPanel {
             id="19"+getId;
         }
         clearCustomerData();
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "SELECT * FROM c_details WHERE CustomerIdNumber='"+id+"' ";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                  c_ID =rs.getString("CustomerIdNumber");c_Status =rs.getString("CustomerStatus");
-                  c_Name  =rs.getString("CustomerFullName");c_HPhone =rs.getInt("CustomerHandPhone");
-                  c_LPhone =rs.getInt("CustomerLandPhone");c_Add =rs.getString("CustomerHomeAddress");
-                  c_email =rs.getString("CustomerEmailAddress");c_Gen=rs.getString("CustomerGender");
-                  c_dob =rs.getString("CustomerDOB");c_Relig  =rs.getString("CustomerReligion");
-                  c_Nati =rs.getString("CustomerNationality");c_Gs  =rs.getString("CustomerGSDivisionNameNo");
-                  c_Pos =rs.getString("CustomerPostalCode");c_Dur =rs.getString("CustomerDurationOfStay");
-                  c_Mar =rs.getString("CustomerMaritalStatus");
-            } 
-
-        cFullName.setText(getC_Name());
-        comboFname.setSelectedItem(getC_Status());//.getSelectedItem();
-        cAddress.setText(getC_Add());
+        DBQuary.getCustomers(customer, id);
+        cFullName.setText(customer.getCustomerFullName());
+        comboFname.setSelectedItem(customer.getCustomerStatus());//.getSelectedItem();
+        cAddress.setText(customer.getCustomerHomeAddress());
         
-        String dobTemp[]=getC_dob().split("-");
+        String dobTemp[]=customer.getCustomerDOB().toString().split("-");
         cYear.setText(dobTemp[0]);
         comboMonth.setSelectedItem(dobTemp[1]);
         comboDay.setSelectedItem(dobTemp[2]);
         
         
-        cComboReligion.setSelectedItem(getC_Relig());
+        cComboReligion.setSelectedItem(customer.getCustomerReligion());
         
-        if( getC_Gen().equals("Male")){male.isSelected();
+        if(customer.getCustomerGender().equals("Male")){male.isSelected();
         }else{female.isSelected();}
-        comboNationality.setSelectedItem(getC_Nati());
-        c_Mobile_Number.setText("0"+String.valueOf(getC_HPhone()));
-        c_Land_Phone_Number.setText("0"+String.valueOf(getC_LPhone()));
-        c_Email.setText(getC_email());
-        cGSDiv.setText(getC_Gs());
-        cPotalCode.setText(getC_Pos());
+        comboNationality.setSelectedItem(customer.getCustomerNationality());
+        c_Mobile_Number.setText("0"+String.valueOf(customer.getCustomerHandPhone()));
+        c_Land_Phone_Number.setText("0"+String.valueOf(customer.getCustomerLandPhone()));
+        c_Email.setText(customer.getCustomerEmailAddress());
+        cGSDiv.setText(customer.getCustomerGSDivisionNameNo());
+        cPotalCode.setText(customer.getCustomerPostalCode());
         
-        String durTemp[]=getC_Dur().split("/");
+        String durTemp[]=customer.getCustomerDurationOfStay().split("/");
         cDurYear.setText(durTemp[0]);
         cDurMonth.setText(durTemp[1]);
         
         
-        if( getC_Mar().equals("Single")){cMariSingle.isSelected();}
-        else if(getC_Mar().equals("Widow")){cMariWidow.isSelected();
-        }else if(getC_Mar().equals("Married")){cMariMarried.isSelected();
-        }else{cMariDivorce.isSelected();}
-  
-        conn.close();
-        } catch (Exception e) {
-            System.out.println(e);
+        switch(customer.getCustomerMaritalStatus()){
+            case "Single":
+                cMariSingle.isSelected();
+                break;
+            case "Widow":
+                cMariWidow.isSelected();
+                break;
+            case "Married":
+                cMariMarried.isSelected();
+                break;
+            default:
+                cMariDivorce.isSelected();
+                break;
         }
+
     }
     public void businessDataLoad(String getId){
         clearBusinessData();
-        try {
-            String sql = "SELECT * FROM `c_business` WHERE BusinessRegisteredNo='"+getId+"' ";
-            //DatabaseConnection c=new DatabaseConnection();
-            java.sql.Connection conn =DatabaseConnection.connect();
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-         
-                  bName=rs.getString("BusinessName");breg=rs.getString("BusinessRegisteredNo");
-                  bnature=rs.getString("NatureofBusiness");bAddress=rs.getString("BusinessAddress");
-                  bEmail=rs.getString("BusinessEmail");bBusienssLocation=rs.getString("BusinessLocationOwnership");
-                  bDuration=rs.getString("DurationAtPresentLocation");bLocation=rs.getString("BusinessLocation");
-                  bExpeince=rs.getString("ExperienceInBusiness");bAvailability=rs.getString("AvailabilityofInsurancePolicy");
-                  bmobile=rs.getInt("MobilePhoneNumber");bFix=rs.getInt("FixedPhoneNumber");
-                  bsum=rs.getDouble("SumofInsured");bPost=rs.getString("BPostalCode");
-            } 
-            b_Name.setText(getbName());b_NatureBus.setText(getBnature());
-            String getAddress[]=getbAddress().split("~~");
-            b_Add1.setText(getAddress[0]);
-            b_Add2.setText(getAddress[1]);
-            b_regNo.setText(getBreg());b_PostCode.setText(getbPost());
-            b_Hphone.setText(String.valueOf(getBmobile()));b_Lphone.setText(String.valueOf(getbFix()));
-            b_Email.setText(getbEmail());
-            b_LocatOwner.setSelectedItem(getbBusienssLocation());
-            String Dur[]=getbDuration().split("/");
-            b_DurYear.setText(Dur[0]);
-            b_DurMonth.setText(Dur[1]);           
-            b_Location.setSelectedItem(getbLocation());
-            String Exp[]=getbExpeince().split("/");
-            b_ExpYear.setText(Exp[0]);
-            b_ExpMonth.setText(Exp[1]);
-            
-            if(getbAvailability().equals("Yes")){
-               b_AYes.isSelected();
-            }else{
-               b_ANo.isSelected() ;
-            }
-            b_SumInsured.setText(String.valueOf(getBsum()));
-            
-            conn.close();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,"Error \n\n"+e.getMessage());
+        DBQuary.getBusiness(business, getId);
+
+        b_Name.setText(business.getBusinessName());b_NatureBus.setText(business.getNatureofBusiness());
+        String getAddress[]=business.getBusinessAddress().split("~~");
+        b_Add1.setText(getAddress[0]);
+        b_Add2.setText(getAddress[1]);
+        b_regNo.setText(business.getBusinessRegisteredNo());b_PostCode.setText(business.getBPostalCode());
+        b_Hphone.setText(String.valueOf(business.getMobilePhoneNumber()));b_Lphone.setText(String.valueOf(business.getFixedPhoneNumber()));
+        b_Email.setText(business.getBusinessEmail());
+        b_LocatOwner.setSelectedItem(business.getBusinessLocationOwnership());
+        String Dur[]=business.getDurationAtPresentLocation().split("/");
+        b_DurYear.setText(Dur[0]);
+        b_DurMonth.setText(Dur[1]);           
+        b_Location.setSelectedItem(business.getBusinessLocation());
+        String Exp[]=business.getExperienceInBusiness().split("/");
+        b_ExpYear.setText(Exp[0]);
+        b_ExpMonth.setText(Exp[1]);
+
+        if(business.getAvailabilityofInsurancePolicy().equals("Yes")){
+           b_AYes.isSelected();
+        }else{
+           b_ANo.isSelected() ;
         }
+        b_SumInsured.setText(String.valueOf(business.getSumofInsured()));
+
     }
     public void customerDataUpdate(String getId,boolean getUpdateOrInesrt){//insert=true update=false
+        ArrayList<String> cus=new ArrayList<>();
         String newNic=getId;
         if(c_Nic.getText().length()==9){newNic="19"+c_Nic.getText();
         }else{newNic=c_Nic.getText();}
@@ -784,24 +537,16 @@ public class LoanGet extends javax.swing.JPanel {
             }
             hphone=Integer.valueOf(hp);
             lphone=Integer.valueOf(lp);
+            cus.add(fName);cus.add(cStatus);cus.add(fName);cus.add(hp);cus.add(lp);
+            cus.add(address);cus.add(email);cus.add(gen);cus.add(date);cus.add(religion);
+            cus.add(nationalaty);cus.add(GS);cus.add(postal);cus.add(duration);cus.add(marrid);
 
-            try{
-                java.sql.Connection conn =DatabaseConnection.connect();
-                if(getUpdateOrInesrt){
-                    String quary="INSERT INTO c_details (CustomerIdNumber,CustomerStatus,CustomerFullName,CustomerHandPhone,CustomerLandPhone,CustomerHomeAddress,CustomerEmailAddress,CustomerGender,CustomerDOB,CustomerReligion,CustomerNationality,CustomerGSDivisionNameNo,CustomerPostalCode,CustomerDurationOfStay,CustomerMaritalStatus) VALUES ('"+newNic+"','"+cStatus+"','"+fName+"','"+hphone+"','"+lphone+"','"+address+"','"+email+"','"+gen+"','"+date+"','"+religion+"','"+nationalaty+"','"+GS+"','"+postal+"','"+duration+"','"+marrid+"')";
-                    PreparedStatement pre =conn.prepareStatement(quary);
-                    pre.execute();
-                }else{
-                    String sql = "UPDATE c_details SET CustomerStatus='"+cStatus+"',CustomerFullName='"+fName+"',CustomerHandPhone='"+hphone+"',CustomerLandPhone='"+lphone+"',CustomerHomeAddress='"+address+"',CustomerEmailAddress='"+email+"',CustomerGender='"+gen+"',CustomerDOB='"+date+"',CustomerReligion='"+religion+"',CustomerNationality='"+nationalaty+"',CustomerGSDivisionNameNo='"+GS+"',CustomerPostalCode='"+postal+"',CustomerDurationOfStay='"+duration+"',CustomerMaritalStatus='"+marrid+"' WHERE CustomerIdNumber='"+newNic+"' "; 
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();               
-                }
-                JOptionPane.showMessageDialog(null,"Success !");
-                conn.close();
-
-            }catch(Exception c){
-                JOptionPane.showMessageDialog(null,"Faild \n\n"+c.getMessage());
+            if(getUpdateOrInesrt){
+                DBQuary.insertCustomer(customer, cus);
+            }else{
+                DBQuary.updateCustomer(customer, cus);
             }
+
         }else{
             if(fName.isEmpty()){
                 lblc_name.setForeground(Color.red);
@@ -838,6 +583,7 @@ public class LoanGet extends javax.swing.JPanel {
         }
     }
     public void businessDataUpdate(String getId,boolean getUpdateOrInesrt){//insert=true update=false
+        ArrayList<String> b=new ArrayList<>();
         String BReg=getId;
         String BN,Nature,BAdd,BPost,BLO,DAtPresL,BLocation,ExpInBus,AvaofInsPol,HP,LP,BEmail;
         int hphone,lphone;
@@ -875,25 +621,18 @@ public class LoanGet extends javax.swing.JPanel {
             
             hphone=Integer.valueOf(HP);
             lphone=Integer.valueOf(LP);
-            try{
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-                java.sql.Connection conn =DatabaseConnection.connect();
-                if(getUpdateOrInesrt){
-                    String quary="INSERT INTO c_business (BusinessName,BusinessRegisteredNo,NatureofBusiness,BusinessAddress,BusinessEmail,BPostalCode,BusinessLocationOwnership,DurationAtPresentLocation,MobilePhoneNumber,FixedPhoneNumber,BusinessLocation,ExperienceInBusiness,AvailabilityofInsurancePolicy,SumofInsured,EmployId) VALUES ('"+BN+"','"+BReg+"','"+Nature+"','"+BAdd+"','"+BEmail+"','"+BPost+"','"+BLO+"','"+DAtPresL+"','"+hphone+"','"+lphone+"','"+BLocation+"','"+ExpInBus+"','"+AvaofInsPol+"','"+sum+"','"+EMP+"')";
-                    PreparedStatement pre =conn.prepareStatement(quary);
-                    pre.execute();
-                }else{//BN,Nature,BAdd,BPost,BLO,DAtPresL,BLocation,ExpInBus,AvaofInsPol,HP,LP,BEmail;
-                    String sql = " UPDATE c_business SET BusinessName='"+BN+"',NatureofBusiness='"+Nature+"',BusinessAddress='"+BAdd+"',BusinessEmail='"+BEmail+"',BPostalCode='"+BPost+"',BusinessLocationOwnership='"+BLO+"',DurationAtPresentLocation='"+DAtPresL+"',MobilePhoneNumber='"+HP+"',FixedPhoneNumber='"+LP+"',BusinessLocation='"+BLocation+"',ExperienceInBusiness='"+ExpInBus+"',AvailabilityofInsurancePolicy='"+AvaofInsPol+"',SumofInsured='"+sum+"' ,EmployId='"+EMP+"' WHERE BusinessRegisteredNo='"+BReg+"' "; 
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute(); 
-                }
-                JOptionPane.showMessageDialog(null,"Success !");
-                conn.close();
+            //BN,Nature,BAdd,BPost,BLO,DAtPresL,BLocation,ExpInBus,AvaofInsPol,HP,LP,BEmail;
+            b.add(BN);b.add(BReg);b.add(Nature);b.add(BAdd);b.add(BEmail);
+            b.add(BPost);b.add(BLO);b.add(DAtPresL);b.add(HP);b.add(LP);
+            b.add(BLocation);b.add(ExpInBus);b.add(AvaofInsPol);b.add(String.valueOf(sum));b.add(EMP);
 
-            }catch(Exception c){
-                JOptionPane.showMessageDialog(null,"Error !\n\n"+c.getMessage());
-            }        
+            if(getUpdateOrInesrt){ 
+                DBQuary.insertBusiness(business, b);
+            }else{                   
+                DBQuary.updateBusiness(business, b); 
+            }
+            JOptionPane.showMessageDialog(null,"Success !");
+
         }else{
             if(BN.isEmpty()){
                 lblBN.setForeground(Color.red);
@@ -936,60 +675,19 @@ public class LoanGet extends javax.swing.JPanel {
         String id=getId;
         if(sPLoan.isSelected()){
             customerDataLoad(id);
-            try{
-                java.sql.Connection conn =DatabaseConnection.connect();
-                String sql = "SELECT * FROM c_personal_loan_tempory WHERE CustomerIdNumber='"+id+"'";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                ResultSet rs = pst.executeQuery();
-                while (rs.next()) {
-                    t_loanAmount=rs.getDouble("loanAmount");
-                    t_loanName=rs.getString("loanName");
-                    t_loanType=rs.getString("loanType");
-                    t_terms=rs.getInt("loanTerms");
-                    t_loanRate=rs.getDouble("loanInterestRate");
-                    t_state=rs.getString("loanStatus");
-                    getFNumber=rs.getString("formNo");
-                    if(getFNumber.length()>=1){
-                        getFormNumber.setText(getFNumber);
-                    }
-                }
-
-                conn.close();
-            }catch(Exception v){
-                System.out.println(v);
-                JOptionPane.showMessageDialog(null,"Faild \n\n"+v.getMessage());
+            DBQuary.getPersonalLoanTemporaryThree(personalTempary, id);
+            if(getFNumber.length()>=1){
+                getFormNumber.setText(getFNumber);
             }
         }else if(sBLoan.isSelected()){
             businessDataLoad(id);
-            try{
-                //Class.forName("com.mysql.jdbc.Driver");
-               // java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-                java.sql.Connection conn =DatabaseConnection.connect();
-                String sql = "SELECT * FROM c_business_loan_tempory WHERE BusinessRegisteredNo='"+id+"'";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                ResultSet rs = pst.executeQuery();
-                while (rs.next()) {
-                    t_loanAmount=rs.getDouble("loanAmount");
-                    t_loanName=rs.getString("loanName");
-                    t_loanType=rs.getString("loanType");
-                    t_terms=rs.getInt("loanTerms");
-                    t_loanRate=rs.getDouble("loanInterestRate");
-                    t_state=rs.getString("loanStatus");
-                    getFNumber=rs.getString("formNo");
-                    if(getFNumber.length()>=1){
-                        getFormNumber.setText(getFNumber);
-                    }
-                }
-                conn.close();
-            }catch(Exception v){
-                System.out.println(v);
+            DBQuary.getBusinessLoanTemporaryThree(BusinessTempary, id);
+            if(getFNumber.length()>=1){
+                getFormNumber.setText(getFNumber);
             }
-        }else{
-            
-        }          
+        }else{}          
     }
     public void finalReportLoad(String getvalue){
-        
         DefaultTableModel model = (DefaultTableModel)tblFinalReport.getModel();
         while(model.getRowCount()>0){
             for(int p=0;p<model.getRowCount();p++){
@@ -1010,13 +708,13 @@ public class LoanGet extends javax.swing.JPanel {
                 finalReportDataGet(getvalue);
                 customerDataLoad(getvalue);
                 model.addRow(new Object[]{"__________Loan Reciver__________",""});model.addRow(new Object[]{"",""});
-                model.addRow(new Object[]{"Full name", getC_Name()});model.addRow(new Object[]{"Permanent Address", getC_Add()});
-                model.addRow(new Object[]{"National Id No", getC_ID()});model.addRow(new Object[]{"Date of Birth", getC_dob()});
-                model.addRow(new Object[]{"Religion", getC_Relig()});model.addRow(new Object[]{"Gender", getC_Gen()});
-                model.addRow(new Object[]{"Nationality", getC_Nati()});model.addRow(new Object[]{"Mobile Phone Number", getC_HPhone()});
-                model.addRow(new Object[]{"Land Phone Number", getC_LPhone()});model.addRow(new Object[]{"E-Mail Address", getC_email()});
-                model.addRow(new Object[]{"G/S Division Name & No", getC_Gs()});model.addRow(new Object[]{"Postal Code", getC_Pos()});
-                model.addRow(new Object[]{"Duration of Stay", getC_Dur()});model.addRow(new Object[]{"Marital Status", getC_Mar()});
+                model.addRow(new Object[]{"Full name", customer.getCustomerFullName()});model.addRow(new Object[]{"Permanent Address", customer.getCustomerHomeAddress()});
+                model.addRow(new Object[]{"National Id No", customer.getCustomerIdNumber()});model.addRow(new Object[]{"Date of Birth", customer.getCustomerDOB()});
+                model.addRow(new Object[]{"Religion", customer.getCustomerReligion()});model.addRow(new Object[]{"Gender", customer.getCustomerGender()});
+                model.addRow(new Object[]{"Nationality", customer.getCustomerNationality()});model.addRow(new Object[]{"Mobile Phone Number", customer.getCustomerHandPhone()});
+                model.addRow(new Object[]{"Land Phone Number", customer.getCustomerLandPhone()});model.addRow(new Object[]{"E-Mail Address", customer.getCustomerEmailAddress()});
+                model.addRow(new Object[]{"G/S Division Name & No", customer.getCustomerGSDivisionNameNo()});model.addRow(new Object[]{"Postal Code", customer.getCustomerPostalCode()});
+                model.addRow(new Object[]{"Duration of Stay", customer.getCustomerDurationOfStay()});model.addRow(new Object[]{"Marital Status", customer.getCustomerMaritalStatus()});
                 model.addRow(new Object[]{"",""});
                 model.addRow(new Object[]{"__________Basic Loan Details__________",""});model.addRow(new Object[]{"",""});
                 model.addRow(new Object[]{"Loan Name",t_loanName});model.addRow(new Object[]{"Loan Type",t_loanType});
@@ -1041,20 +739,20 @@ public class LoanGet extends javax.swing.JPanel {
                 finalReportDataGet(getvalue);
                 businessDataLoad(getvalue);
                 model.addRow(new Object[]{"__________Loan Reciver__________",""});model.addRow(new Object[]{"",""});
-                model.addRow(new Object[]{"Business name", getbName()});
-                model.addRow(new Object[]{"Permanent Address", getbAddress()});
-                model.addRow(new Object[]{"Business Email", getbEmail()});
-                model.addRow(new Object[]{"Business Reg No", getBreg()});
-                model.addRow(new Object[]{"Nature of Business", getBnature()});
-                model.addRow(new Object[]{"Business Location", getbLocation()});
-                model.addRow(new Object[]{"Business Location Ownership", getbLocation()});
-                model.addRow(new Object[]{"Duration At Present Location", getbDuration()});
-                model.addRow(new Object[]{"Experience In Business", getbExpeince()});
-                model.addRow(new Object[]{"Availability of Insurance Policy", getbAvailability()});
-                model.addRow(new Object[]{"Mobile Phone Number", getBmobile()});
-                model.addRow(new Object[]{"Fixed Phone Number", getbFix()});
-                model.addRow(new Object[]{"Business Postal Code", getbPost()});
-                model.addRow(new Object[]{"Sum of Insured", getBsum()}); 
+                model.addRow(new Object[]{"Business name", business.getBusinessName()});
+                model.addRow(new Object[]{"Permanent Address", business.getBusinessAddress()});
+                model.addRow(new Object[]{"Business Email", business.getBusinessEmail()});
+                model.addRow(new Object[]{"Business Reg No", business.getBusinessRegisteredNo()});
+                model.addRow(new Object[]{"Nature of Business", business.getNatureofBusiness()});
+                model.addRow(new Object[]{"Business Location", business.getBusinessLocation()});
+                model.addRow(new Object[]{"Business Location Ownership", business.getBusinessLocationOwnership()});
+                model.addRow(new Object[]{"Duration At Present Location", business.getDurationAtPresentLocation()});
+                model.addRow(new Object[]{"Experience In Business", business.getExperienceInBusiness()});
+                model.addRow(new Object[]{"Availability of Insurance Policy", business.getAvailabilityofInsurancePolicy()});
+                model.addRow(new Object[]{"Mobile Phone Number", business.getMobilePhoneNumber()});
+                model.addRow(new Object[]{"Fixed Phone Number", business.getFixedPhoneNumber()});
+                model.addRow(new Object[]{"Business Postal Code", business.getBPostalCode()});
+                model.addRow(new Object[]{"Sum of Insured", business.getSumofInsured()}); 
                 
                 
                 model.addRow(new Object[]{"",""});
@@ -1153,6 +851,8 @@ public class LoanGet extends javax.swing.JPanel {
   
     }    
     public void basicLoanDataInsertUpdate(String type){//1 insert 2 update
+        ArrayList<String> p=new ArrayList<>();
+        ArrayList<String> b=new ArrayList<>();
         String formNumber;
         String temporyWord="save";
         String newNic;
@@ -1186,60 +886,29 @@ public class LoanGet extends javax.swing.JPanel {
         if(loanReciever.getSelectedIndex()==0){
             formNumber="PL"+newNic;
             if(c_Nic.getText().length()>1){
-                try{
-                    java.sql.Connection conn =DatabaseConnection.connect();
-                    if(type.equals("insert")){
-                        String sql = "INSERT INTO c_personal_loan_tempory(loanName,loanType,loanStatus,loanAmount,loanTerms,loanInterestRate,CustomerIdNumber,EmployId,formNo,comment) VALUES ('"+t_loanName+"','"+t_loanType+"','"+temporyWord+"','"+t_loanAmount+"','"+t_terms+"','"+t_loanRate+"','"+newNic+"','"+EMP+"','"+formNumber+"','')";
-                        PreparedStatement pst = conn.prepareStatement(sql);
-                        pst.execute();
-                        JOptionPane.showMessageDialog(null,"Data Insert Sucess...");
-                        getFormNumber.setText(newNic);
-                    }else if(type.equals("update")){
-                        //basicLoanLoad(newNic);
-                       // if(t_formNo.equals(newNic)){
-                            //id samanada samanainm ok update
-                            String sql = "UPDATE c_personal_loan_tempory SET loanName='"+t_loanName+"' ,loanType='"+t_loanType+"',loanAmount='"+t_loanAmount+"', loanTerms='"+t_terms+"', loanInterestRate='"+t_loanRate+"' WHERE CustomerIdNumber='"+newNic+"' "; 
-                            PreparedStatement pst = conn.prepareStatement(sql);
-                            pst.execute();  
-                            JOptionPane.showMessageDialog(null,"Data Update Sucess...");
-                        //}else{
-                        //    JOptionPane.showMessageDialog(null,"Uer Loan Aprovelled..\nCannot Edit now");
-                        //}
-                    }
-                    conn.close();
-                }catch(Exception v){
-                    System.out.println(v);
-                    JOptionPane.showMessageDialog(null,"Faild \n\n"+v.getMessage());
+                p.add(t_loanName);p.add(t_loanType);p.add(temporyWord);p.add(String.valueOf(t_loanAmount));p.add(String.valueOf(t_terms));
+                p.add(String.valueOf(t_loanRate));p.add(newNic);p.add(EMP);p.add(formNumber);p.add("");
+
+                if(type.equals("insert")){
+                    DBQuary.insertPersonalLoanTemporary(p);
+                    getFormNumber.setText(newNic);
+                }else if(type.equals("update")){
+                    DBQuary.updatePersonalLoanTemporaryThree(p, newNic);
                 }
+
             }else{
                 JOptionPane.showMessageDialog(null,"Unsucess full");
             }
         }else{
             formNumber="BL"+b_reg;
             if(b_regNo.getText().length()>1){
-                try{
-                    java.sql.Connection conn =DatabaseConnection.connect();
-                    if(type.equals("insert")){
-                        String sql="   INSERT INTO `c_business_loan_tempory`(`loanName`, `loanType`, `loanInterestRate`, `loanAmount`, `loanTerms`, `loanStatus`, `comment`, `BusinessRegisteredNo`, `EmployId`,formNo) VALUES ('"+b_LoanName+"','"+b_LoanType+"','"+b_interestRate+"','"+b_LoanAmount+"','"+b_terms+"','"+b_LoanStatus+"','"+" "+"','"+b_reg+"','"+EMP+"','"+formNumber+"')   ";
-                        PreparedStatement pst = conn.prepareStatement(sql);
-                        pst.execute();
-                        JOptionPane.showMessageDialog(null,"Data Insert Sucess...");
-                        getFormNumber.setText(b_reg);
-                    }else if(type.equals("update")){
-                       // basicLoanLoadBusiness(b_reg);
-                       // if(b_formNo.equals(b_reg)){
-                            String sql=" UPDATE `c_business_loan_tempory` SET `loanName`='"+b_LoanName+"',`loanType`='"+b_LoanType+"',`loanInterestRate`='"+b_interestRate+"',`loanAmount`='"+b_LoanAmount+"',`loanTerms`='"+b_terms+"',`loanStatus`='"+b_LoanStatus+"' WHERE BusinessRegisteredNo='"+b_reg+"' ";//,`comment`='"+" "+"' ,formNo='"+" "+"'
-                            PreparedStatement pst = conn.prepareStatement(sql);
-                            pst.execute();  
-                            JOptionPane.showMessageDialog(null,"Data Update Sucess...");
-                       // }else{
-                       //     JOptionPane.showMessageDialog(null,"Uer Loan Aprovelled..\nCannot Edit now");
-                       // }
-                    }
-                    conn.close();
-                }catch(Exception v){
-                    System.out.println(v);
-                    JOptionPane.showMessageDialog(null,"Faild \n\n"+v.getMessage());
+                b.add(b_LoanName);b.add(b_LoanType);b.add(String.valueOf(b_interestRate));b.add(String.valueOf(b_LoanAmount));b.add(String.valueOf(b_terms));
+                b.add(b_LoanStatus);b.add("");b.add(b_reg);b.add(EMP);b.add(formNumber);
+                if(type.equals("insert")){
+                    DBQuary.insertBusinessLoanTemporary(b, b_reg);
+                    getFormNumber.setText(b_reg);
+                }else if(type.equals("update")){
+                    DBQuary.updateBusinessLoanTemporaryTwo(b, b_reg);
                 }
             }else{
                 JOptionPane.showMessageDialog(null,"Unsucess full");
@@ -1247,76 +916,41 @@ public class LoanGet extends javax.swing.JPanel {
         }
     }
     public void basicLoanLoadBusiness(String reg){
-        String b_LoanName = null,b_LoanType = null;
-        Double b_LoanAmount = null,b_interestRate = null;
-        int b_terms = 0;
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "SELECT * FROM c_business_loan_tempory WHERE BusinessRegisteredNo='"+reg+"' ";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                b_LoanAmount=rs.getDouble("loanAmount");
-                b_interestRate=rs.getDouble("loanInterestRate");
-                b_LoanName=rs.getString("loanName");
-                b_LoanType=rs.getString("loanType");
-                b_terms=rs.getInt("loanTerms");
-                b_formNo=rs.getString("formNo");
-            } 
-            comboLoanNames.setSelectedItem(b_LoanName);
-            comboLoanBlance.setSelectedItem(b_LoanType);
-            double value=b_LoanAmount;
-            if ((int)value < value){
-                txtAmountCustom.setText(String.valueOf(value));
-            }else{
-                comboLoanAmount.setSelectedItem(String.valueOf((int)value));
-                if(comboLoanAmount.getSelectedIndex()==0){
-                    txtAmountCustom.setText(String.valueOf((int)value));
-                }
+        DBQuary.getBusinessLoanTemporaryThree(BusinessTempary, reg);
+        comboLoanNames.setSelectedItem(BusinessTempary.getLoanName());
+        comboLoanBlance.setSelectedItem(BusinessTempary.getLoanType());
+        double value=BusinessTempary.getLoanAmount();
+        if ((int)value < value){
+            txtAmountCustom.setText(String.valueOf(value));
+        }else{
+            comboLoanAmount.setSelectedItem(String.valueOf((int)value));
+            if(comboLoanAmount.getSelectedIndex()==0){
+                txtAmountCustom.setText(String.valueOf((int)value));
             }
-            txtTerms.setText(String.valueOf(b_terms));
-            //txtRate.setText(String.valueOf(String.valueOf(b_interestRate))); 
-            cmbRate.setSelectedItem((String.valueOf(b_interestRate)));
-        conn.close();
+        }
+        txtTerms.setText(String.valueOf(BusinessTempary.getLoanTerms()));
+        cmbRate.setSelectedItem((String.valueOf(BusinessTempary.getLoanInterestRate())));
         tableLoaderEqual();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,"No Loan Request");
-        }        
+        
     }
     public void basicLoanLoad(String id){
-        try {
-            java.sql.Connection conn =DatabaseConnection.connect();
-            String sql = "SELECT * FROM c_personal_loan_tempory WHERE CustomerIdNumber='"+id+"' ";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            ResultSet rs = pst.executeQuery();
-            while (rs.next()) {
-                t_loanAmount=rs.getDouble("loanAmount");
-                t_loanRate=rs.getDouble("loanInterestRate");
-                t_loanName=rs.getString("loanName");
-                t_loanType=rs.getString("loanType");
-                t_terms=rs.getInt("loanTerms");
-                t_formNo=rs.getString("formNo");
-            } 
-            comboLoanNames.setSelectedItem(t_loanName);
-            comboLoanBlance.setSelectedItem(t_loanType);
-            double value=t_loanAmount;
-            if ((int)value < value){
-                txtAmountCustom.setText(String.valueOf(value));
-            }else{
-                comboLoanAmount.setSelectedItem(String.valueOf((int)value));
-                if(comboLoanAmount.getSelectedIndex()==0){
-                    txtAmountCustom.setText(String.valueOf((int)value));
-                }
+        DBQuary.getPersonalLoanTemporaryThree(personalTempary, id);
+
+        comboLoanNames.setSelectedItem(personalTempary.getLoanName());
+        comboLoanBlance.setSelectedItem(personalTempary.getLoanType());
+        double value=personalTempary.getLoanAmount();
+        if ((int)value < value){
+            txtAmountCustom.setText(String.valueOf(value));
+        }else{
+            comboLoanAmount.setSelectedItem(String.valueOf((int)value));
+            if(comboLoanAmount.getSelectedIndex()==0){
+                txtAmountCustom.setText(String.valueOf((int)value));
             }
-            txtTerms.setText(String.valueOf(t_terms));
-            //txtRate.setText(String.valueOf(String.valueOf(t_loanRate))); 
-            cmbRate.setSelectedItem((String.valueOf(t_loanRate)));
-        conn.close();
-        tableLoaderEqual();
-        } catch (Exception e) {
-            System.out.println(e);
-            JOptionPane.showMessageDialog(null,"No Loan Request");
         }
+        txtTerms.setText(String.valueOf(personalTempary.getLoanTerms()));
+        cmbRate.setSelectedItem((String.valueOf(personalTempary.getLoanInterestRate())));
+        tableLoaderEqual();
+
     }
 
     
@@ -3802,12 +3436,6 @@ public class LoanGet extends javax.swing.JPanel {
 
     private void aproolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aproolActionPerformed
         finalReportLoad();
-        //approllNic="n",approllBReg="n";
-        /*if(!getFormNumber.getText().isEmpty()){
-            approall();
-        }else{
-            JOptionPane.showMessageDialog(null,"Please Enter Form Number");
-        }*/
         if(getFNumber.equals(approllNic) || getFNumber.equals(approllBReg)){
             approall();
         }else{
@@ -3973,9 +3601,7 @@ public class LoanGet extends javax.swing.JPanel {
         clearAllTableData();
         tableRefresh(newNic,0);
         finalReportLoad(newNic);
-        
-        
-        
+
     }//GEN-LAST:event_btnDefaultValues1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -4067,31 +3693,12 @@ public class LoanGet extends javax.swing.JPanel {
         String Nic;
         int answer = JOptionPane.showConfirmDialog(null,"Do you want Deleate That Recode ?");//0 yes,1 no,2 cancel
         if(answer==0){
-            try {
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-                java.sql.Connection conn =DatabaseConnection.connect();
-                for(Integer vc:getSelectedRowIndex){
-                    Nic=model.getValueAt(vc,1).toString();
-                    String sql = "DELETE FROM c_guarantor_details WHERE Guarantor_Nic='"+Nic+"' ";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.execute();
-                }
-                // JOptionPane.showMessageDialog(null,"Data Delete Success..");
-                conn.close();
-            }
-            catch (Exception e) {
-                System.out.println(e);
+            for(Integer vc:getSelectedRowIndex){
+                Nic=model.getValueAt(vc,1).toString();
+                DBQuary.deleteGuarantorsTwo(Nic);
             }
         }
-        //String getSelect=(String) ratingName.getSelectedItem();
-
-        String newNic;
-        if(c_Nic.getText().length()==9){
-            newNic="19"+c_Nic.getText();
-        }else{
-            newNic=c_Nic.getText();
-        }
+        String newNic=getnic.getNicNumber(c_Nic.getText());
 
         clearAllTableData();
         tableRefresh(newNic,0);
@@ -4167,7 +3774,7 @@ public class LoanGet extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         DefaultTableModel model = (DefaultTableModel) tblGuarantorsDetails.getModel();
-
+        ArrayList<String> g=new ArrayList<>();
         String Gname, Gemail, GAddress, Hphone, Lphone, Nic,emp;
         int Hphone2, Lphone2;
         String newNic;
@@ -4199,24 +3806,11 @@ public class LoanGet extends javax.swing.JPanel {
         }
 
         if (!Gname.isEmpty() && !Nic.isEmpty() && !GAddress.isEmpty() &&(!Hphone.isEmpty() || !Lphone.isEmpty())) {
-            try {
-                //Class.forName("com.mysql.jdbc.Driver");
-                //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
-                java.sql.Connection conn =DatabaseConnection.connect();
-                Hphone2 = Integer.valueOf(Hphone);
-                Lphone2 = Integer.valueOf(Lphone);
+            g.add(Gname);g.add(Nic);g.add(Hphone);g.add(Lphone);g.add(GAddress);
+            g.add(Gemail);g.add(newNic);
 
-                String quary="INSERT INTO c_guarantor_details(Guarantor_Name,Guarantor_Nic,Guarantor_Phone_Number,Guarantor_Land_Phone,Guarantor_Home_Address,Guarantor_Email,CustomerIdNumber) VALUES ('"+Gname+"','"+Nic+"','"+Hphone2+"','"+Lphone2+"','"+GAddress+"','"+Gemail+"','"+newNic+"')";
-                PreparedStatement pre =conn.prepareStatement(quary);
-                pre.execute();
+            DBQuary.insertGuarantors(g);
 
-                conn.close();
-                JOptionPane.showMessageDialog(null,"Success !");
-
-            }
-            catch (Exception e) {
-                System.out.println(e);
-            }
         }else{
             if(Gname.isEmpty()){
                 emp="Name";

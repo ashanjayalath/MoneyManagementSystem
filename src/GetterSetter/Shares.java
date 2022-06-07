@@ -3,7 +3,7 @@ package GetterSetter;
 import classPack.DBQuary;
 
 public class Shares extends DBQuary {
-
+    private double Total,IshuMoney,Holder,Owner,Other,OtherLoan,precent;
     /**
      * @return the Total
      */
@@ -101,5 +101,5 @@ public class Shares extends DBQuary {
     public void setPrecent(double precent) {
         this.precent = precent;
     }
-    private double Total,IshuMoney,Holder,Owner,Other,OtherLoan,precent;
+
 }

@@ -1,17 +1,11 @@
 package AdminForm;
 
-import LoanForms.*;
+
 import classPack.DatabaseConnection;
-import static classPack.DatabaseConnection.EMP;
 import java.awt.Color;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import micro.Employee;
-import micro.Main;
 
 public class AdminSettings extends javax.swing.JPanel {
     private boolean re;

@@ -2,7 +2,6 @@ package LoanForms;
 
 import classPack.DatabaseConnection;
 import static classPack.DatabaseConnection.EMP;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JScrollBar;

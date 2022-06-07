@@ -1,5 +1,7 @@
 package AdminForm;
 
+import GetterSetter.Business;
+import GetterSetter.Customers;
 import LoanForms.LoanGet;
 import classPack.DatabaseConnection;
 import java.sql.PreparedStatement;
@@ -10,6 +12,8 @@ import javax.swing.table.DefaultTableModel;
 public class PersonDetails extends javax.swing.JFrame {
 
     private String getvalue;
+    Customers customer=new Customers();
+    Business business=new Business();
     public PersonDetails() {
         initComponents();
     }
@@ -34,15 +38,15 @@ public class PersonDetails extends javax.swing.JFrame {
             }
         if(getvalue.substring(0,2).equals("PL")){
                 lo.customerDataLoad(getvalue.substring(2,getvalue.length()));
-                model.addRow(new Object[]{"Full name",lo.getC_Name()});model.addRow(new Object[]{"Permanent Address",lo.getC_Add()});
-                model.addRow(new Object[]{"National Id No",lo.getC_ID()});model.addRow(new Object[]{"Date of Birth",lo.getC_dob()});
-                model.addRow(new Object[]{"Religion",lo.getC_Relig()});model.addRow(new Object[]{"Gender",lo.getC_Gen()});
-                model.addRow(new Object[]{"Nationality",lo.getC_Nati()});model.addRow(new Object[]{"Mobile Phone Number",lo.getC_HPhone()});
-                model.addRow(new Object[]{"Land Phone Number",lo.getC_LPhone()});model.addRow(new Object[]{"E-Mail Address",lo.getC_email()});
-                model.addRow(new Object[]{"G/S Division Name & No",lo.getC_Gs()});model.addRow(new Object[]{"Postal Code",lo.getC_Pos()});
-                model.addRow(new Object[]{"Duration of Stay",lo.getC_Dur()});model.addRow(new Object[]{"Marital Status",lo.getC_Mar()});
+                model.addRow(new Object[]{"Full name", customer.getCustomerFullName()});model.addRow(new Object[]{"Permanent Address", customer.getCustomerHomeAddress()});
+                model.addRow(new Object[]{"National Id No", customer.getCustomerIdNumber()});model.addRow(new Object[]{"Date of Birth", customer.getCustomerDOB()});
+                model.addRow(new Object[]{"Religion", customer.getCustomerReligion()});model.addRow(new Object[]{"Gender", customer.getCustomerGender()});
+                model.addRow(new Object[]{"Nationality", customer.getCustomerNationality()});model.addRow(new Object[]{"Mobile Phone Number", customer.getCustomerHandPhone()});
+                model.addRow(new Object[]{"Land Phone Number", customer.getCustomerLandPhone()});model.addRow(new Object[]{"E-Mail Address", customer.getCustomerEmailAddress()});
+                model.addRow(new Object[]{"G/S Division Name & No", customer.getCustomerGSDivisionNameNo()});model.addRow(new Object[]{"Postal Code", customer.getCustomerPostalCode()});
+                model.addRow(new Object[]{"Duration of Stay", customer.getCustomerDurationOfStay()});model.addRow(new Object[]{"Marital Status", customer.getCustomerMaritalStatus()});
 
-              
+                
             try {
                 DefaultTableModel model2 = (DefaultTableModel) guarantorsDetailsColect.getModel();
                 while(model2.getRowCount()>0){
@@ -57,22 +61,21 @@ public class PersonDetails extends javax.swing.JFrame {
             }
         
         }else if(getvalue.substring(0,2).equals("BL")){//bussiness
-                lo.businessDataLoad(getvalue.substring(2,getvalue.length()));
-                model.addRow(new Object[]{"Business name",lo.getbName()});
-                model.addRow(new Object[]{"Permanent Address",lo.getbAddress()});
-                model.addRow(new Object[]{"Business Email",lo.getbEmail()});
-                model.addRow(new Object[]{"Business Reg No",lo.getBreg()});
-                model.addRow(new Object[]{"Nature of Business",lo.getBnature()});
-                model.addRow(new Object[]{"Business Location",lo.getbLocation()});
-                model.addRow(new Object[]{"Business Location Ownership",lo.getbLocation()});
-                model.addRow(new Object[]{"Duration At Present Location",lo.getbDuration()});
-                model.addRow(new Object[]{"Experience In Business",lo.getbExpeince()});
-                model.addRow(new Object[]{"Availability of Insurance Policy",lo.getbAvailability()});
-                model.addRow(new Object[]{"Mobile Phone Number",lo.getBmobile()});
-                model.addRow(new Object[]{"Fixed Phone Number",lo.getbFix()});
-                model.addRow(new Object[]{"Business Postal Code",lo.getbPost()});
-                model.addRow(new Object[]{"Sum of Insured",lo.getBsum()}); 
-
+                lo.businessDataLoad(getvalue.substring(2,getvalue.length()));               
+                model.addRow(new Object[]{"Business name", business.getBusinessName()});
+                model.addRow(new Object[]{"Permanent Address", business.getBusinessAddress()});
+                model.addRow(new Object[]{"Business Email", business.getBusinessEmail()});
+                model.addRow(new Object[]{"Business Reg No", business.getBusinessRegisteredNo()});
+                model.addRow(new Object[]{"Nature of Business", business.getNatureofBusiness()});
+                model.addRow(new Object[]{"Business Location", business.getBusinessLocation()});
+                model.addRow(new Object[]{"Business Location Ownership", business.getBusinessLocationOwnership()});
+                model.addRow(new Object[]{"Duration At Present Location", business.getDurationAtPresentLocation()});
+                model.addRow(new Object[]{"Experience In Business", business.getExperienceInBusiness()});
+                model.addRow(new Object[]{"Availability of Insurance Policy", business.getAvailabilityofInsurancePolicy()});
+                model.addRow(new Object[]{"Mobile Phone Number", business.getMobilePhoneNumber()});
+                model.addRow(new Object[]{"Fixed Phone Number", business.getFixedPhoneNumber()});
+                model.addRow(new Object[]{"Business Postal Code", business.getBPostalCode()});
+                model.addRow(new Object[]{"Sum of Insured", business.getSumofInsured()}); 
         }else{
             DefaultTableModel model2 = (DefaultTableModel)personalDetailsColect.getModel();
             while(model2.getRowCount()>0){

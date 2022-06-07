@@ -1,20 +1,15 @@
 package AdminForm;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.MouseListener;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
@@ -294,18 +289,7 @@ public class ProfitReportGet extends javax.swing.JFrame {
     }//GEN-LAST:event_clearSelectActionPerformed
 
     private void clearAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllActionPerformed
-        /*reportTableTwo.setModel(new DefaultTableModel(null,new String[]{"Loan Type","Loan Value","Rates (%)","Terms","Loan Divided Terms","Due Amount","Equated Profit","Equated Normal Profit","Equal Profit","Maximum Profit","Maximum Rate Type"}));
-        for(int c=0;c<selectIndex.length;c++){
-            System.out.print(c+" - ");
-            selectIndex[c]=null;
-        }
-        System.out.println();
-        for(String v:selectIndex){
-            System.out.print(v+" + ");
-        }
-        
-        */
-        DefaultTableModel model = (DefaultTableModel) reportTableTwo.getModel();
+       DefaultTableModel model = (DefaultTableModel) reportTableTwo.getModel();
         while(true){
             if(reportTableTwo.getRowCount()==0){
                 break;

@@ -1,11 +1,12 @@
 package AdminForm;
 
+import GetterSetter.BusinessLoanTempory;
+import GetterSetter.PersonalLoanTempory;
+import GetterSetter.Shares;
 import LoanForms.LoanGet;
+import classPack.DBQuary;
 import classPack.DatabaseConnection;
 import classPack.LoanCalculation;
-import static com.mysql.cj.MysqlType.DATETIME;
-import static com.sun.mail.imap.protocol.INTERNALDATE.format;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DateFormat;
@@ -13,19 +14,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.Icon;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.table.DefaultTableModel;
 import scrollbar.ScrollBarCustom;
 
 
-public class AdminDashboard extends javax.swing.JPanel {
-    private String loanName,loanType,loanStatus,profit,nic,EmpId,loanNumber;
-    private int loanTerms,loanId;
-    private double loanAmount,loanRate,payment,dueAmount,empty;
-    private double monthPay[];
-    private double interestRate[];
+public class AdminDashboard extends javax.swing.JPanel {    
+    private double payment,dueAmount;
     private String setMonth="";
     private String setRate="";
     public AdminDashboard() {
@@ -49,7 +45,9 @@ public class AdminDashboard extends javax.swing.JPanel {
         
     }
 
-    
+    PersonalLoanTempory personalTempory=new PersonalLoanTempory();
+    BusinessLoanTempory business=new BusinessLoanTempory();
+    Shares share=new Shares();
     public void tableLoad(String getName){
         DefaultTableModel model = (DefaultTableModel) customerTable.getModel();
         try {
@@ -162,19 +160,10 @@ public class AdminDashboard extends javax.swing.JPanel {
         }
     }
     public void callAccept(){
-       // LoanCalculation lon=new LoanCalculation();
-
-        //accept recodes
-        //1.select the row and get datas and pass the data loan table
-        //2.after the delet tempory table data
-        //customerTable
-
-        
-        //form number is printed in every form
         try{
             DefaultTableModel model = (DefaultTableModel) customerTable.getModel();
             int []getSelectedRowIndex=customerTable.getSelectedRows();
-            loanStatus ="Accept";
+            String loanStatus ="Accept";
             DateFormat df=new SimpleDateFormat("yyyy-MM-dd");
             Date d=new Date();
             String loanIshuDate=df.format(d);
@@ -182,22 +171,10 @@ public class AdminDashboard extends javax.swing.JPanel {
             
             java.sql.Connection conn =DatabaseConnection.connect();
             for(Integer a:getSelectedRowIndex) {
-                loanId = (int) model.getValueAt(a, 0);
-                String sql="SELECT * FROM c_personal_loan_tempory WHERE loanId='"+loanId+"' ";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                ResultSet rs = pst.executeQuery();   
-                while (rs.next()) {
-                    loanName = rs.getString("loanName");
-                    loanType = rs.getString("loanType");
-                    loanAmount = rs.getDouble("loanAmount");
-                    loanTerms = rs.getInt("loanTerms");
-                    loanRate = rs.getDouble("loanInterestRate");
-                    nic=rs.getString("CustomerIdNumber");
-                    EmpId=rs.getString("EmployId");
-                    loanNumber=rs.getString("formNo");
-                }
-                getPersonalLoan(loanName,loanAmount,loanRate,loanTerms);//loan name,amount,interes,terms
-                String sql2 = "INSERT INTO personal_loan(loanIshuDate,loanName,loanType,loanInterestRate,loanTerms,loanAmount,monthlyPayment,profit,payment,dueAmount,loanStatus,CustomerIdNumber,EmployId,TotalAmount,futurePayment,loanNumber,comment) VALUES ('"+loanIshuDate+"','"+loanName+"','"+loanType+"','"+loanRate+"','"+loanTerms+"','"+loanAmount+"','"+setMonth+"','"+setRate+"','','"+dueAmount+"','"+loanStatus+"','"+nic+"','"+EmpId+"','"+empty+"','"+empty+"','"+loanNumber+"','')";
+                int loanId = (int) model.getValueAt(a, 0);
+                DBQuary.getPersonalLoanTemporary(personalTempory, loanId);
+                getPersonalLoan(personalTempory.getLoanName(),personalTempory.getLoanAmount(),personalTempory.getLoanInterestRate(),personalTempory.getLoanTerms());//loan name,amount,interes,terms
+                String sql2 = "INSERT INTO personal_loan(loanIshuDate,loanName,loanType,loanInterestRate,loanTerms,loanAmount,monthlyPayment,profit,payment,dueAmount,loanStatus,CustomerIdNumber,EmployId,TotalAmount,futurePayment,loanNumber,comment) VALUES ('"+loanIshuDate+"','"+personalTempory.getLoanName()+"','"+personalTempory.getLoanType()+"','"+personalTempory.getLoanInterestRate()+"','"+personalTempory.getLoanTerms()+"','"+personalTempory.getLoanAmount()+"','"+setMonth+"','"+setRate+"','','"+dueAmount+"','"+loanStatus+"','"+personalTempory.getCustomerIdNumber()+"','"+personalTempory.getEmployId()+"','','','"+personalTempory.getFormNo()+"','')";
                 PreparedStatement pst2 = conn.prepareStatement(sql2);
                 pst2.execute();
                 
@@ -216,7 +193,7 @@ public class AdminDashboard extends javax.swing.JPanel {
 }
     public void getPersonalLoan(String loanName,double loanAmount,double loanRate,int loanTerms){//amount,interest,term
         LoanCalculation lon=new LoanCalculation();
-        this.loanTerms=loanTerms;
+        //this.loanTerms=loanTerms;
         if(loanName.equals("Diriya") || loanName.equals("Swashakthi")){//diriya
             lon.equatedInstalment(loanAmount, loanRate, loanTerms);//week1 week2
         }else if(loanName.equals("Sahana") || loanName.equals("Saving")){//sahana
@@ -300,15 +277,12 @@ public class AdminDashboard extends javax.swing.JPanel {
     }//business
     public void callRejectBusiness(){
         DefaultTableModel model = (DefaultTableModel) businessTable.getModel();
-        int id;
         int []getSelectedRowIndex=businessTable.getSelectedRows();
         try {
             java.sql.Connection conn =DatabaseConnection.connect();
             for(Integer a:getSelectedRowIndex) {
-                id = (int) model.getValueAt(a, 0);
-                String sql = "DELETE FROM c_business_loan_tempory WHERE `loanId`='"+id+"' ";//WHERE Rating_Id_name='"+getData+"' 
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.execute();
+                int id = (int) model.getValueAt(a, 0);
+                DBQuary.deleteBusinessLoanTemporary(id);
             }            
         conn.close();            
         }catch(Exception v){
@@ -340,7 +314,7 @@ public class AdminDashboard extends javax.swing.JPanel {
         //customerTable
         DefaultTableModel model = (DefaultTableModel) businessTable.getModel();
         int []getSelectedRowIndex=businessTable.getSelectedRows();
-        loanStatus ="Accept";
+        String loanStatus ="Accept";
         DateFormat df=new SimpleDateFormat("yyyy-MM-dd");
         Date d=new Date();
         String loanIshuDate=df.format(d);
@@ -349,22 +323,12 @@ public class AdminDashboard extends javax.swing.JPanel {
         try{
             java.sql.Connection conn =DatabaseConnection.connect();
             for(Integer a:getSelectedRowIndex) {
-                loanId = (int) model.getValueAt(a, 0);
-                String sql="SELECT * FROM c_business_loan_tempory WHERE loanId='"+loanId+"' ";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                ResultSet rs = pst.executeQuery();   
-                while (rs.next()) {
-                    loanName = rs.getString("loanName");
-                    loanType = rs.getString("loanType");
-                    loanAmount = rs.getDouble("loanAmount");
-                    loanTerms = rs.getInt("loanTerms");
-                    loanRate = rs.getDouble("loanInterestRate");
-                    nic=rs.getString("BusinessRegisteredNo");
-                    EmpId=rs.getString("EmployId");
-                    loanNumber=rs.getString("formNo");
-                }
-                getPersonalLoan(loanName,loanAmount,loanRate,loanTerms);//loan name,amount,interes,terms
-                String sql2 = "INSERT INTO business_loan(loanIshuDate,loanName,loanType,loanInterestRate,loanTerms,loanAmount,monthlyPayment,profit,payment,dueAmount,loanStatus,BusinessRegisteredNo,EmployId,TotalAmount,futurePayment,loanNumber,comment) VALUES ('"+loanIshuDate+"','"+loanName+"','"+loanType+"','"+loanRate+"','"+loanTerms+"','"+loanAmount+"','"+setMonth+"','"+setRate+"','"+payment+"','"+dueAmount+"','"+loanStatus+"','"+nic+"','"+EmpId+"','"+empty+"','"+empty+"','"+loanNumber+"','')";
+                int loanId = (int) model.getValueAt(a, 0);
+                DBQuary.getBusinessLoanTemporary(business, loanId);
+                //getPersonalLoan(loanName,loanAmount,loanRate,loanTerms);//loan name,amount,interes,terms
+                getPersonalLoan(business.getLoanName(),business.getLoanAmount(),business.getLoanInterestRate(),business.getLoanTerms());//loan name,amount,interes,terms
+                
+                String sql2 = "INSERT INTO business_loan(loanIshuDate,loanName,loanType,loanInterestRate,loanTerms,loanAmount,monthlyPayment,profit,payment,dueAmount,loanStatus,BusinessRegisteredNo,EmployId,TotalAmount,futurePayment,loanNumber,comment) VALUES ('"+loanIshuDate+"','"+business.getLoanName()+"','"+business.getLoanType()+"','"+business.getLoanInterestRate()+"','"+business.getLoanTerms()+"','"+business.getLoanAmount()+"','"+setMonth+"','"+setRate+"','"+payment+"','"+dueAmount+"','"+loanStatus+"','"+business.getBusinessRegisteredNo()+"','"+business.getEmployId()+"','','','"+business.getFormNo()+"','')";
                 PreparedStatement pst2 = conn.prepareStatement(sql2);
                 pst2.execute();
                 
@@ -383,7 +347,7 @@ public class AdminDashboard extends javax.swing.JPanel {
 }//business
     public void getBusinessLoan(String loanName,double loanAmount,double loanRate,int loanTerms){//amount,interest,term
         LoanCalculation lon=new LoanCalculation();
-        this.loanTerms=loanTerms;
+        //this.loanTerms=loanTerms;
         if(loanName.equals("Diriya") || loanName.equals("Swashakthi")){//diriya
             lon.equatedInstalment(loanAmount, loanRate, loanTerms);//week1 week2
         }else if(loanName.equals("Sahana") || loanName.equals("Saving")){//sahana
@@ -1079,18 +1043,11 @@ public class AdminDashboard extends javax.swing.JPanel {
             int c=JOptionPane.showConfirmDialog(null,"Do you want Accept this?");
             if(c==0){
                 try {
-                    java.sql.Connection conn =DatabaseConnection.connect();
-                    String sqlOne="SELECT * FROM micro_shares WHERE share_id=1 ";
-                    PreparedStatement pst = conn.prepareStatement(sqlOne);
-                    ResultSet rs = pst.executeQuery();
-                    double total=0;
-                    double share=0;
-                    while(rs.next()){
-                        total=rs.getDouble("total_shares");
-                        share=rs.getDouble("total_ishu_money");
-                    }double LoanAMount=(double) model.getValueAt(selectedRow,4);
-                    double NewShare=share+LoanAMount;
-                    double NewTotal=total-LoanAMount;
+                    java.sql.Connection conn =DatabaseConnection.connect();                 
+                    DBQuary.getSharesData(share);
+                    double LoanAMount=(double) model.getValueAt(selectedRow,4);
+                    double NewShare=share.getIshuMoney()+LoanAMount;
+                    double NewTotal=share.getTotal()-LoanAMount;
                     
                     if(NewTotal>0){
                         String sql = "UPDATE micro_shares SET total_ishu_money='"+NewShare+"' , total_shares='"+NewTotal+"' WHERE share_id = 1 "; 
@@ -1098,8 +1055,8 @@ public class AdminDashboard extends javax.swing.JPanel {
                         pst2.execute();  
                         callAccept();
                         tableLoad("Request");
-                        LoanGet n=new LoanGet();
-                        n.getSharesData();
+                        
+                        DBQuary.getSharesData(share);
                     }else{
                         JOptionPane.showMessageDialog(null,"Company shares Low..You can't Accept This Loan.");
                     }
@@ -1130,10 +1087,6 @@ public class AdminDashboard extends javax.swing.JPanel {
         callPending("Hold");
         clearAllTableData();
         tableLoad("Request");
-
-
-
-        
     }//GEN-LAST:event_btnHoldActionPerformed
 
     private void btnRejectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRejectActionPerformed
@@ -1151,21 +1104,11 @@ public class AdminDashboard extends javax.swing.JPanel {
             int c=JOptionPane.showConfirmDialog(null,"Do you want Accept this?");
             if(c==0){
                 try {
-                    //Class.forName("com.mysql.jdbc.Driver");
-                    //java.sql.Connection conn = (java.sql.Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/micro","root","");
                     java.sql.Connection conn =DatabaseConnection.connect();
-                    String sqlOne="SELECT * FROM micro_shares WHERE share_id=1 ";
-                    PreparedStatement pst = conn.prepareStatement(sqlOne);
-                    ResultSet rs = pst.executeQuery();
-                    double total=0;
-                    double share=0;
-                    while(rs.next()){
-                        total=rs.getDouble("total_shares");
-                        share=rs.getDouble("total_ishu_money");
-                    }double LoanAMount=(double) model.getValueAt(selectedRow,4);
-                    double NewShare=share+LoanAMount;
-                    double NewTotal=total-LoanAMount;
-                    
+                    DBQuary.getSharesData(share);
+                    double LoanAMount=(double) model.getValueAt(selectedRow,4);
+                    double NewShare=share.getIshuMoney()+LoanAMount;
+                    double NewTotal=share.getTotal()-LoanAMount;                    
                     if(NewTotal>0){
                         String sql = "UPDATE micro_shares SET total_ishu_money='"+NewShare+"' , total_shares='"+NewTotal+"' WHERE share_id = 1 "; 
                         PreparedStatement pst2 = conn.prepareStatement(sql);
@@ -1173,8 +1116,7 @@ public class AdminDashboard extends javax.swing.JPanel {
                         
                         callAcceptBusiness();
                         tableLoadBusiness("Request");
-                        LoanGet n=new LoanGet();
-                        n.getSharesData();
+                        DBQuary.getSharesData(share);
                         
                         
                     }else{
